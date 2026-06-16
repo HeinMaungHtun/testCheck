@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Data Checklist</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #0a6ed1;
+  --primary-hover: #055cba;
+  --success-color: #107e3e;
+  --warning-color: #e74c3c;
+  --error-color: #d32f2f;
+  --info-color: #0066cc;
+  --light-gray: #f5f5f5;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #666;
+  --text-color: #333;
+  --border-color: #d0d0d0;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  color: var(--text-color);
+  line-height: 1.6;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 4px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #0052a3 100%);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.header p {
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.content {
+  padding: 30px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+select, input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(10, 110, 209, 0.1);
+}
+
+select:hover {
+  border-color: var(--primary-color);
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background: var(--light-gray);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: #eeeeee;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-overlay.active {
+  display: flex;
+}
+
+.loading-box {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.loading-box .spinner {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+  border-top-color: var(--primary-color);
+  border-color: rgba(10, 110, 209, 0.2);
+  margin: 0 auto 16px;
+}
+
+.loading-box p {
+  color: var(--dark-gray);
+  font-size: 14px;
+}
+
+/* Alert Messages */
+.alert {
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.alert.show {
+  display: flex;
+}
+
+.alert-success {
+  background: #c8e6c9;
+  color: #2e7d32;
+  border-left: 4px solid #4caf50;
+}
+
+.alert-error {
+  background: #ffcdd2;
+  color: #c62828;
+  border-left: 4px solid #f44336;
+}
+
+/* Table Styling */
+.table-container {
+  overflow-y: auto;
+  margin-bottom: 24px;
+  max-height: 600px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead {
+  background: var(--light-gray);
+  border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-color);
+  background: var(--light-gray);
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+tr:hover {
+  background: #fafafa;
+}
+
+.status-select {
+  padding: 8px 12px;
+  min-width: 120px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-green {
+  background: #c8e6c9;
+  color: #2e7d32;
+}
+
+.status-amber {
+  background: #ffe0b2;
+  color: #e65100;
+}
+
+.status-red {
+  background: #ffcdd2;
+  color: #c62828;
+}
+
+.status-none {
+  background: var(--light-gray);
+  color: var(--dark-gray);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--dark-gray);
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.footer {
+  background: var(--light-gray);
+  padding: 20px 30px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.success-icon::before {
+  content: "✓";
+}
+
+.error-icon::before {
+  content: "✕";
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .header {
+    padding: 20px;
+  }
+  
+  .header h1 {
+    font-size: 22px;
+  }
+  
+  .content {
+    padding: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p>Processing...</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>Master Data Checklist</h1>
+    <p>Manage and track your data efficiently</p>
+  </div>
+
+  <div class="content">
+    <div class="alert alert-success" id="successAlert">
+      <span class="success-icon"></span>
+      <span id="successMessage">Data saved successfully</span>
+    </div>
+    
+    <div class="alert alert-error" id="errorAlert">
+      <span class="error-icon"></span>
+      <span id="errorMessage">An error occurred</span>
+    </div>
+
+    <div class="form-group">
+      <div class="form-row">
+        <div>
+          <label for="company">Company *</label>
+          <select id="company" onchange="handleCompanyChange()">
+            <option value="">Select Company</option>
+          </select>
+        </div>
+        <div>
+          <label for="category">Category *</label>
+          <select id="category" onchange="handleCategoryChange()">
+            <option value="">Select Category</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top: 16px;">
+        <div>
+          <label for="filterDate">Filter Date (Today)</label>
+          <input type="date" id="filterDate" disabled style="background: var(--light-gray); cursor: not-allowed;">
+        </div>
+        <div style="display: flex; align-items: flex-end;">
+          <button class="btn-primary" onclick="loadTasks()" style="width: 100%; justify-content: center;">
+            <span>🔄</span>
+            <span>Load Tasks</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="table-container">
+      <table id="tasksTable">
+        <thead>
+          <tr>
+            <th style="width: 5%;">ID</th>            
+            <th style="width: 20%;">Category</th>
+            <th style="width: 30%;">Task</th>
+            <th style="width: 20%;">Current Status</th>
+            <th style="width: 25%;">New Status</th>
+          </tr>
+        </thead>
+        <tbody id="taskBody">
+          <tr>
+            <td colspan="4" class="empty-state">
+              Select company and category, then click "Load Tasks"
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="btn-secondary" onclick="resetForm()">Reset</button>
+    <button class="btn-primary" onclick="submitTasks()">
+      <span id="submitSpinner"></span>
+      <span id="submitText">Submit</span>
+    </button>
+  </div>
+</div>
+
+<script>
+
+window.onload = function () {
+  loadCompanies();
+  loadCategories();
+  setTodayDate();
+};
+
+// Set Today's Date
+function setTodayDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const dateString = `${year}-${month}-${day}`;
+  document.getElementById('filterDate').value = dateString;
+}
+function showLoading(show = true) {
+  const overlay = document.getElementById('loadingOverlay');
+  if (show) {
+    overlay.classList.add('active');
+  } else {
+    overlay.classList.remove('active');
+  }
+}
+
+// Show Alert
+function showAlert(message, type = 'success') {
+  const alertId = type === 'success' ? 'successAlert' : 'errorAlert';
+  const messageId = type === 'success' ? 'successMessage' : 'errorMessage';
+  
+  document.getElementById(messageId).textContent = message;
+  document.getElementById(alertId).classList.add('show');
+  
+  setTimeout(() => {
+    document.getElementById(alertId).classList.remove('show');
+  }, 4000);
+}
+
+// Load Companies
+function loadCompanies() {
+  showLoading(true);
+  google.script.run.withSuccessHandler(data => {
+    let el = document.getElementById("company");
+    el.innerHTML = `<option value="">Select Company</option>` +
+      data.map(c => `<option value="${c}">${c}</option>`).join("");
+    showLoading(false);
+  }).withFailureHandler(error => {
+    console.error(error);
+    showAlert('Failed to load companies', 'error');
+    showLoading(false);
+  }).getCompanies();
+}
+
+// Load Categories
+function loadCategories() {
+  showLoading(true);
+  google.script.run.withSuccessHandler(data => {
+    let el = document.getElementById("category");
+    el.innerHTML = `<option value="">Select Category</option>` +
+      data.map(c => `<option value="${c}">${c}</option>`).join("");
+    showLoading(false);
+  }).withFailureHandler(error => {
+    console.error(error);
+    showAlert('Failed to load categories', 'error');
+    showLoading(false);
+  }).getCategories();
+}
+
+function handleCompanyChange() {
+  // Optional: Add any logic when company changes
+}
+
+function handleCategoryChange() {
+  // Optional: Add any logic when category changes
+}
+
+// Load Tasks
+function loadTasks() {
+  let company = document.getElementById("company").value;
+  let category = document.getElementById("category").value;
+
+  if (!company || !category) {
+    showAlert('Please select both Company and Category', 'error');
+    return;
+  }
+
+  showLoading(true);
+  google.script.run.withSuccessHandler(data => {
+    let html = "";
+
+    if (data.length === 0) {
+      html = `<tr><td colspan="4" class="empty-state">No tasks found</td></tr>`;
+    } else {
+      data.forEach(t => {
+        const statusBadge = getStatusBadge(t.status);
+        html += `
+          <tr>
+            <td>${t.rowId}</td>          
+            <td>${t.category}</td>
+            <td>${t.task}</td>
+            <td>${statusBadge}</td>
+            <td>
+              <select class="status-select" data-task-id="${t.rowId}">
+                <option value="">-- Select --</option>
+                <option value="Compeleted">🟢 Compeleted</option>
+                <option value="Delay">🟠 Delay</option>
+                <option value="Not Started">🔴 Not Started</option>
+              </select>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById("taskBody").innerHTML = html;
+    showLoading(false);
+  }).withFailureHandler(error => {
+    console.error(error);
+    showAlert('Failed to load tasks', 'error');
+    showLoading(false);
+  }).getTasks(company, category);
+}
+
+function getStatusBadge(status) {
+  const badges = {
+    'Compeleted': '<span class="status-badge status-green">🟢 Compeleted</span>',
+    'Delay': '<span class="status-badge status-amber">🟠 Delay</span>',
+    'Not Started': '<span class="status-badge status-red">🔴 Not Started</span>'
+  };
+  return badges[status] || '<span class="status-badge status-none">No Status</span>';
+}
+
+// Submit Tasks (Upsert)
+function submitTasks() {
+  let company = document.getElementById("company").value;
+  let category = document.getElementById("category").value;
+
+  if (!company || !category) {
+    showAlert('Please select both Company and Category', 'error');
+    return;
+  }
+
+  // Collect form data
+  const selects = document.querySelectorAll('.status-select');
+  const tasks = [];
+  
+  selects.forEach(select => {
+    if (select.value) {
+      tasks.push({
+        rowId: select.dataset.rowId,
+        status: select.value
+      });
+    }
+  });
+
+  if (tasks.length === 0) {
+    showAlert('Please select at least one status', 'error');
+    return;
+  }
+
+  showLoading(true);
+  const submitBtn = document.querySelector('.btn-primary:last-of-type');
+  submitBtn.disabled = true;
+
+  const payload = {
+    company: company,
+    category: category,
+    tasks: tasks,
+    date: new Date()
+  };
+
+  google.script.run
+    .withSuccessHandler(result => {
+      showLoading(false);
+      submitBtn.disabled = false;
+      showAlert('Data saved successfully!', 'success');
+      resetForm();
+    })
+    .withFailureHandler(error => {
+      showLoading(false);
+      submitBtn.disabled = false;
+      console.error(error);
+      showAlert('Failed to save data: ' + error.message, 'error');
+    })
+    .saveTasks(payload);
+}
+
+// Reset Form
+function resetForm() {
+  document.getElementById('company').value = '';
+  document.getElementById('category').value = '';
+  document.getElementById('taskBody').innerHTML = 
+    `<tr><td colspan="4" class="empty-state">Select company and category, then click "Load Tasks"</td></tr>`;
+}
+
+</script>
+</body>
+</html>
